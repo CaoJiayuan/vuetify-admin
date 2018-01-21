@@ -1,4 +1,9 @@
-*
-!/dist
-!/entry-point.sh
-!/nginx.conf.template
+/node_modules
+/src
+/package-lock.json
+/package.json
+/webpack.mix.js
+/mix-manifest.json
+/.gitignore
+/.env.example
+/.env
