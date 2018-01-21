@@ -1,0 +1,4 @@
+*
+!/dist
+!/entry-point.sh
+!/nginx.conf.template
