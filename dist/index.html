@@ -13,11 +13,13 @@
     <v-app>
         <navigation v-if="!isLogin"></navigation>
         <top-bar v-if="!isLogin"></top-bar>
-        <v-content>
+        <v-content :class="theme.dark ? 'grey lighten-2' : 'white'">
             <transition name="slide" mode="out-in">
                 <router-view></router-view>
             </transition>
+
         </v-content>
+      <mfooter></mfooter>
     </v-app>
     <toast></toast>
 </div>
@@ -30,5 +32,6 @@
 <script src="https://cdn.bootcss.com/lodash.js/4.17.4/lodash.min.js"></script>
 <script src="https://cdn.bootcss.com/chance/1.0.13/chance.min.js"></script>
 <script src="https://cdn.bootcss.com/axios/0.17.1/axios.min.js"></script>
+<script src="https://cdn.bootcss.com/accounting.js/0.4.1/accounting.min.js"></script>
 <script src="/js/app.js"></script>
 </html>

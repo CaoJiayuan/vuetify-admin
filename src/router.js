@@ -8,6 +8,13 @@ const routes = [
         }
     },
     {
+        path : '/users',
+        component: require('./pages/account/Index.vue'),
+        meta:{
+            title:'Accounts'
+        }
+    },
+    {
         path: LOGIN_PATH,
         component: require('./pages/login/Index.vue'),
         meta:{

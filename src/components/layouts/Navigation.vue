@@ -1,5 +1,5 @@
 <template>
-    <v-navigation-drawer fixed v-model="open" app light>
+    <v-navigation-drawer :dark="theme.dark" fixed v-model="open" app>
         <v-toolbar flat>
             <v-list>
                 <v-list-tile>
@@ -69,7 +69,8 @@
                 }
             },
             ...mapGetters({
-                nav: 'navigation'
+                nav: 'navigation',
+                theme : 'theme'
             })
         },
         components: {},
