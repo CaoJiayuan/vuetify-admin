@@ -48,7 +48,7 @@
                 UserApi.login(this.post).then(re => {
                     this.requesting = false;
                     this.$router.push('/dashboard');
-                })
+                }).catch(error => this.requesting = false)
             }
         },
         mounted() {
