@@ -15,9 +15,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "bootstrap-sass": "^3.3.7",
     "cross-env": "^5.0.1",
     "dotenv": "^4.0.0",
-    "laravel-mix": "^1.0"
+    "laravel-mix": "^1.0",
+    "vuetify": "^0.17.6"
   },
   "dependencies": {
     "collect.js": "^4.0.4"

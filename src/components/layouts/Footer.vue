@@ -6,7 +6,7 @@
         </v-btn>
         <v-btn color="white" dark small bottom right fab @click="changeTheme({color:'white'})">
         </v-btn>
-        <v-btn color="primary" dark small bottom right fab @click="changeTheme({color:'primary', dark:true})">
+        <v-btn color="primary" dark small bottom right fab @click="changeTheme({color:'primary'})">
         </v-btn>
     </v-footer>
 </template>

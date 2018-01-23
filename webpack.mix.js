@@ -13,5 +13,6 @@ require('dotenv').config();
  */
 
 mix.copy('src/index.html', 'dist')
+    .copy('src/images', 'dist/images')
     .js('src/app.js', 'dist/js')
     .sass('src/app.sass', 'dist/css');

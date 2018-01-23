@@ -2,10 +2,10 @@
     <v-layout>
         <v-flex xs12 md4 offset-md4 style="margin-top: 50px">
             <v-card>
-                <v-toolbar dark color="primary" flat>
-                    <v-toolbar-title class="white--text">Login</v-toolbar-title>
+                <v-toolbar :color="theme.color" :dark="theme.dark" flat>
+                    <v-toolbar-title>Login</v-toolbar-title>
                 </v-toolbar>
-                <v-progress-linear :indeterminate="true" color="green" style="margin: 0" v-if="requesting"></v-progress-linear>
+                <v-progress-linear :indeterminate="true" height="3" color="green" style="margin: 0" v-if="requesting"></v-progress-linear>
                 <v-card-text>
                     <v-form v-model="valid">
                         <v-text-field
@@ -33,6 +33,7 @@
 
 <script>
     import UserApi from '../../apis/UserApi';
+    const mapGetters = Vuex.mapGetters;
     export default {
         data() {
             return {
@@ -40,6 +41,11 @@
                 requesting : false,
                 post :{}
             }
+        },
+        computed:{
+                ...mapGetters({
+                    theme: 'theme'
+                })
         },
         components: {},
         methods   : {
