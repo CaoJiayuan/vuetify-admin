@@ -8,21 +8,24 @@
                     <div v-html="placeholder"></div>
                 </template>
                 <template slot="items" slot-scope="props">
-                    <td v-if="!field.action" :class="field.align ? 'text-xs-'+ field.align : 'text-xs-left'"
-                        v-for="field in fields"
-                        v-html="renderField(props.item, field)" @click="clickField(props.item, field)">
-                    </td>
-                    <td :class="'text-xs-' + actionsAlign" v-if="hasActions">
-                        <v-btn :flat="action.flat" :dark="action.dark"
-                               small :key="$index"
-                               v-for="action in fixedActions" :color="action.color"
-                               :class="action.class"
-                               :fab="!action.text"
-                               @click="callParentMethod(action.click, props.item)">
-                            <v-icon>{{ action.icon }}</v-icon>
-                            {{ action.text }}
-                        </v-btn>
-                    </td>
+                    <tr>
+                        <td v-if="!field.action" :class="field.align ? 'text-xs-'+ field.align : 'text-xs-left'"
+                            v-for="field in fields"
+                            v-html="renderField(props.item, field)" @click="clickField(props.item, field)">
+                        </td>
+                        <td :class="'text-xs-' + actionsAlign" v-if="hasActions">
+                            <v-btn :flat="action.flat" :dark="action.dark"
+                                   small :key="$index"
+                                   v-for="action in fixedActions" :color="action.color"
+                                   :class="action.class"
+                                   :fab="!action.text"
+                                   v-if="showAction(action, props.item)"
+                                   @click="callParentMethod(action.click, props.item)">
+                                <v-icon>{{ action.icon }}</v-icon>
+                                {{ action.text }}
+                            </v-btn>
+                        </td>
+                    </tr>
                 </template>
             </v-data-table>
         </v-flex>
@@ -120,19 +123,16 @@
                     20,
                     25,
                 ],
-                pageSize: 10
+                pageSize: 10,
+                showActions : false
             }
         },
         computed: {
             hasActions () {
                 let has = false
-
                 this.actions.forEach(action => {
-                    if (action['granted'] !== false) {
-                        has = true
-                    }
+                     has = true
                 })
-
                 return has
             },
 
@@ -175,12 +175,23 @@
                 let actions = _.clone(this.actions)
 
                 this.fixedActions = actions.map(action => {
-                    let {icon = '', text = '', color = 'primary', dark = false, flat = false} = action
+                    let {icon = '', text = '', color = 'primary', dark = false, flat = false, granted = true} = action
+
+                    if (granted !== true) {
+                        let fun = this.getParentMethod(granted);
+                        if (fun){
+                            granted = fun
+                        }
+                    } else  {
+                        granted = item => true
+                    }
+
                     action.icon = icon
                     action.text = text
                     action.color = color
                     action.dark = dark
                     action.flat = flat
+                    action.granted = granted
                     return action
                 })
             },
@@ -197,6 +208,18 @@
                 this.load({
                     page: page
                 })
+            },
+            showAction(action, item){
+                let show = true;
+                if (action.granted) {
+                    show = this.callParentMethod(action.granted, item)
+                }
+
+                if (show){
+                    this.showActions = true;
+                }
+
+                return show;
             },
 
             getParentMethod (method) {

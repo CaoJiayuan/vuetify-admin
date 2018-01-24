@@ -57,7 +57,10 @@
                     {
                         icon: 'delete',
                         color: 'error',
-                        click: item => console.log(item)
+                        click: item => console.log(item),
+                        granted: item => {
+                            return item.id % 2 === 1;
+                        }
                     },
                 ]
             }
