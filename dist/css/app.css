@@ -1,1 +1,76 @@
-button:active,button:focus{outline:0}.slide-enter,.slide-enter-active{-webkit-transition:all .3s ease;transition:all .3s ease}.slide-enter,.slide-leave-to{opacity:0}.slide-enter{-webkit-transform:translateX(-3rem);transform:translateX(-3rem)}.slide-leave,.slide-leave-active{-webkit-transition:all .4s ease;transition:all .4s ease}.slide-leave-to{-webkit-transform:translateX(3rem);transform:translateX(3rem)}.slide-enter #carbonads,.slide-enter-active #carbonads,.slide-leave #carbonads,.slide-leave-active #carbonads{display:none!important}
+button:focus,
+button:active {
+  outline: 0;
+}
+
+button {
+  text-align: center;
+}
+
+.circle {
+  border-radius: 100%;
+}
+
+.slide-enter-active,
+.slide-enter {
+  -webkit-transition: all .3s ease;
+  transition: all .3s ease;
+}
+
+.slide-enter,
+.slide-leave-to {
+  opacity: 0;
+}
+
+.slide-enter {
+  -webkit-transform: translateX(-3rem);
+          transform: translateX(-3rem);
+}
+
+.slide-leave,
+.slide-leave-active {
+  -webkit-transition: all .4s ease;
+  transition: all .4s ease;
+}
+
+.slide-leave-to {
+  -webkit-transform: translateX(3rem);
+          transform: translateX(3rem);
+}
+
+.slide-enter #carbonads,
+.slide-enter-active #carbonads,
+.slide-leave #carbonads,
+.slide-leave-active #carbonads {
+  display: none !important;
+}
+
+@-webkit-keyframes rotation {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+
+@keyframes rotation {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+
+.animate.rotation {
+  -webkit-animation: rotation .4s infinite ease;
+          animation: rotation .4s infinite ease;
+}
+

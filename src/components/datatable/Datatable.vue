@@ -8,28 +8,51 @@
                     <div v-html="placeholder"></div>
                 </template>
                 <template slot="items" slot-scope="props">
-                    <td v-if="!field.action" :class="field.align ? 'text-xs-'+ field.align : 'text-xs-left'" v-for="field in fields"
+                    <td v-if="!field.action" :class="field.align ? 'text-xs-'+ field.align : 'text-xs-left'"
+                        v-for="field in fields"
                         v-html="renderField(props.item, field)" @click="clickField(props.item, field)">
                     </td>
                     <td :class="'text-xs-' + actionsAlign" v-if="hasActions">
                         <v-btn :flat="action.flat" :dark="action.dark"
                                small :key="$index"
                                v-for="action in fixedActions" :color="action.color"
+                               :class="action.class"
                                :fab="!action.text"
                                @click="callParentMethod(action.click, props.item)">
-                            <v-icon>{{ action.icon }}</v-icon>{{ action.text }}
+                            <v-icon>{{ action.icon }}</v-icon>
+                            {{ action.text }}
                         </v-btn>
                     </td>
                 </template>
             </v-data-table>
         </v-flex>
-        <v-flex xs12>
-            <div class="text-xs-left pt-2 xs12">
-                <v-pagination @input="page" :total-visible="7" circle v-model="pagination.page"
+        <v-layout xs12 row>
+            <v-flex xs8 class="text-xs-left">
+
+                <v-pagination class="text-xs-center pt-2" @input="page" :total-visible="7" circle
+                              v-model="pagination.page"
                               :length="paginator.last_page"></v-pagination>
-                <v-btn fab small><v-icon>refresh</v-icon></v-btn>
-            </div>
-        </v-flex>
+                <v-btn @click="refresh" :class="refreshing ? 'animate rotation' : ''" color="white"
+                       class="pagination__item circle" style="top: -10px;" fab>
+                    <v-icon>refresh</v-icon>
+                </v-btn>
+            </v-flex>
+            <v-layout xs4 row>
+                <v-flex xs3>
+                    <v-select
+                            :items="pageSizes"
+                            v-model="pageSize"
+                            single-line
+                            bottom
+                            label="Select"
+                            @input="load({})"
+                    ></v-select>
+                </v-flex>
+                <v-flex xs9>
+                    <v-subheader style="height: 74px;">{{displayAction(paginator)}}</v-subheader>
+                </v-flex>
+            </v-layout>
+        </v-layout>
     </v-layout>
 </template>
 
@@ -66,6 +89,10 @@
             mustSort: {
                 type: Boolean,
                 default: true
+            },
+            displayAction: {
+                type: Function,
+                default: paginator => `条/页, 从${paginator.from}到${paginator.to}条，共${paginator.total}条`
             }
         },
         mixins: [theme],
@@ -73,6 +100,7 @@
             return {
                 fields: [],
                 loading: false,
+                refreshing: false,
                 paginator: {
                     total: 0,
                     per_page: 10,
@@ -85,7 +113,14 @@
                     data: []
                 },
                 pagination: {},
-                fixedActions : []
+                fixedActions: [],
+                pageSizes: [
+                    10,
+                    15,
+                    20,
+                    25,
+                ],
+                pageSize: 10
             }
         },
         computed: {
@@ -104,51 +139,56 @@
         },
         components: {},
         methods: {
-            load ({per_page = 10, page = 1, sort}) {
+            load ({per_page = this.pageSize, page = 1, sort}) {
                 this.loading = 'green'
                 return Api.getData(this.apiUrl, {
                     per_page,
                     page,
-                    sort
+                    sort : sort !== undefined ? sort : this.resolveSort(this.pagination)
                 }).then(paginator => {
                     this.loading = false
+                    this.refreshing = false
+
                     this.paginator = paginator
                     this.pagination.page = paginator.current_page
                     this.pagination.rowsPerPage = paginator.per_page
                     this.pagination.totalItems = paginator.total
                     this.emit('loaded', paginator)
-                }).catch(error => this.loading = false)
+                }).catch(error => {
+                    this.loading = false
+                    this.refreshing = false
+                })
             },
             formatHeaders () {
                 this.fields = this.headers.map(header => {
                     header.align = header.align || 'left'
-                    return header;
+                    return header
                 })
                 this.hasActions && this.fields.push({
                     text: this.actionsTitle,
                     align: this.actionsAlign,
-                    sortable:false,
-                    action : true
+                    sortable: false,
+                    action: true
                 })
             },
-            fixActions(){
-                let actions = _.clone(this.actions);
+            fixActions () {
+                let actions = _.clone(this.actions)
 
                 this.fixedActions = actions.map(action => {
                     let {icon = '', text = '', color = 'primary', dark = false, flat = false} = action
-                    action.icon = icon;
-                    action.text = text;
-                    action.color = color;
-                    action.dark = dark;
-                    action.flat = flat;
-                    return action;
-                });
+                    action.icon = icon
+                    action.text = text
+                    action.color = color
+                    action.dark = dark
+                    action.flat = flat
+                    return action
+                })
             },
             renderField (item, field) {
                 let value = item[field.value]
-                let display  = field.display;
+                let display = field.display
                 if (!display) {
-                    return value;
+                    return value
                 }
 
                 return this.callParentMethod(display, value, item)
@@ -176,18 +216,35 @@
                 }
                 return m
             },
-            clickField(item, field){
+            clickField (item, field) {
                 let value = item[field.value]
-                let click = field.click;
+                let click = field.click
                 if (click) {
-                    this.callParentMethod(click, value, item);
+                    this.callParentMethod(click, value, item)
                 }
+            },
+            refresh () {
+                this.refreshing = true
+                this.pagination.sortBy = null
+                return this.load({
+                    per_page : this.pageSize,
+                    page : 1,
+                    sort: null
+                })
+            },
+            resolveSort (pagination) {
+                if (pagination.sortBy) {
+                    let key = pagination.sortBy
+                    key += pagination.descending ? '|desc' : '|asc'
+                    return key
+                }
+                return undefined
             }
         },
         mounted () {
-            this.formatHeaders();
-            this.fixActions();
-            this.apiUrl && this.load({});
+            this.formatHeaders()
+            this.fixActions()
+            this.apiUrl && this.load({})
         },
         created () {
 
@@ -195,11 +252,7 @@
         watch: {
             pagination (now) {
                 if (now.sortBy) {
-                    let key = now.sortBy
-                    key += now.descending ? '|desc' : '|asc'
-                    this.load({
-                        sort: key,
-                    })
+                    this.load({})
                 }
             }
         }
