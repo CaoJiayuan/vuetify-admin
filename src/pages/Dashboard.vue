@@ -53,7 +53,7 @@
         },
         filters:{
             moneny(v){
-                return accounting.formatMoney(v, "¥");
+                return accounting.formatMoney(v / 100, "¥");
             }
         }
     }

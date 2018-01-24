@@ -42,6 +42,10 @@
                         value: 'nickname'
                     },
                     {
+                        text: 'Vip expire',
+                        value: 'vip_expire'
+                    },
+                    {
                         text: 'Created at',
                         value: 'created_at'
                     },

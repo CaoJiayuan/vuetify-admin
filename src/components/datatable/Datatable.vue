@@ -41,7 +41,7 @@
                 </v-btn>
             </v-flex>
             <v-layout xs4 row>
-                <v-flex xs3>
+                <v-flex xs3  class="text-xs-right">
                     <v-select
                             :items="pageSizes"
                             v-model="pageSize"
