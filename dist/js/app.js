@@ -1611,7 +1611,7 @@ var render = function() {
                   staticClass: "pagination__item circle",
                   class: _vm.refreshing ? "animate rotation" : "",
                   staticStyle: { top: "-10px" },
-                  attrs: { color: "white", fab: "" },
+                  attrs: { dark: _vm.theme.dark, fab: "" },
                   on: { click: _vm.refresh }
                 },
                 [_c("v-icon", [_vm._v("refresh")])],

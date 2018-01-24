@@ -32,7 +32,7 @@
                 <v-pagination class="text-xs-center pt-2" @input="page" :total-visible="7" circle
                               v-model="pagination.page"
                               :length="paginator.last_page"></v-pagination>
-                <v-btn @click="refresh" :class="refreshing ? 'animate rotation' : ''" color="white"
+                <v-btn :dark="theme.dark" @click="refresh" :class="refreshing ? 'animate rotation' : ''"
                        class="pagination__item circle" style="top: -10px;" fab>
                     <v-icon>refresh</v-icon>
                 </v-btn>
