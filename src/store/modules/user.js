@@ -1,10 +1,12 @@
 import UserApi from '../../apis/UserApi';
 const state = {
-    user: {}
+    user: {},
+    tokenStatus : 2
 };
 
 const getters = {
-    user: state => state.user
+    user: state => state.user,
+    tokenStatus: state => state.tokenStatus
 };
 
 const actions = {
@@ -18,6 +20,9 @@ const actions = {
 const mutations = {
     setUser(state, {user}) {
         state.user = user;
+    },
+    setTokenStatus(state, status){
+        state.tokenStatus = status;
     }
 };
 

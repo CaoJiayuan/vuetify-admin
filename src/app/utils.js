@@ -146,11 +146,15 @@ Store.prototype.put = function (key, value) {
     }
     storage.setItem(key, string);
 }
-Store.prototype.get = function (key) {
+Store.prototype.get = function (key, $default) {
     let result = storage.getItem(key);
     try {
         result = JSON.parse(result);
     } catch (error) {}
+
+    if (!result) {
+        return $default;
+    }
 
     return result;
 }
