@@ -19,19 +19,25 @@
     export default {
         data() {
             return {
-                mini: false
             }
         },
         computed  : {
+            mini: {
+                get(){
+                    return this.nav.mini
+                },
+                set(now){
+                    this.$store.commit('miniNavigation', {mini: now})
+                }
+            },
             ...mapGetters({
                 user: 'user',
+                nav: 'navigation',
                 theme:'theme'
             })
         },
         components: {},
         methods   : {
-            mimiNav() {
-            },
             logout(){
                 UserApi.logout().then(res => {
                     this.$router.push(LOGIN_PATH)

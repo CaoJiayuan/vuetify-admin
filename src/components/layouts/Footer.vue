@@ -1,6 +1,6 @@
 <template>
     <v-footer fixed :color="theme.color" :dark="theme.dark">
-        <div :style="{color:color}">fanscome.zdhdtech.cn ©{{ new Date().getFullYear() }}</div>
+        <div :style="{color:color}">admin.test ©{{ new Date().getFullYear() }}</div>
         <v-spacer></v-spacer>
         <v-btn color="dark" dark small bottom right fab @click="changeTheme({color:'grey darken-2', dark :true})">
         </v-btn>

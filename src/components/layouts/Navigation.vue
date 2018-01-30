@@ -4,7 +4,7 @@
             <v-list>
                 <v-list-tile>
                     <v-list-tile-title class="title">
-                        <strong>Fans</strong><span v-if="!nav.mini">admin</span>
+                        <strong>Admin</strong><span v-if="!nav.mini">test</span>
                     </v-list-tile-title>
                 </v-list-tile>
             </v-list>

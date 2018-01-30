@@ -20,7 +20,11 @@ const UserApi = {
         })
     },
     logout(){
-        return axios.post('/logout').then(response => response.data)
+        return axios.post('/logout').then(response => {
+            store.remove(TOKEN_EXPIRE_NAME);
+            store.remove(TOKEN_CACHE_NAME);
+            return response.data;
+        })
     },
     afterLogin(token){
         store.put(TOKEN_CACHE_NAME, token.access_token);

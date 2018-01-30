@@ -158,3 +158,7 @@ Store.prototype.get = function (key, $default) {
 
     return result;
 }
+
+Store.prototype.remove = function (key) {
+    storage.removeItem(key);
+}

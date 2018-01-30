@@ -1,33 +1,37 @@
-import {LOGIN_PATH} from './constant';
+import { LOGIN_PATH } from './constant'
+
 const routes = [
     {
-        path : '/dashboard',
+        path: '/dashboard',
         component: require('./pages/Dashboard.vue'),
-        meta:{
-            title:'Dashboard'
+        meta: {
+            title: 'Dashboard'
         }
     },
     {
-        path : '/users',
+        path: '/users',
         component: require('./pages/account/Index.vue'),
-        meta:{
-            title:'Accounts'
+        meta: {
+            title: 'Accounts'
         }
     },
     {
         path: LOGIN_PATH,
         component: require('./pages/login/Index.vue'),
-        meta:{
-            title : 'Login'
+        meta: {
+            title: 'Login',
+            guest: true
         }
+    },
+    {
+        path: '*',
+        redirect: '/dashboard'
     }
-];
-
+]
 
 const router = new VueRouter({
     routes
-});
-
+})
 
 export {
     routes,
