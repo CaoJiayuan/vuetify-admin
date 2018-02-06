@@ -5,7 +5,7 @@
                 <v-toolbar-title>Users</v-toolbar-title>
             </v-toolbar>
             <v-card-title>
-                <data-table :actions="actions" :headers="headers" api-url="/users"></data-table>
+                <data-table v-model="selected" :selectable="true" :actions="actions" :headers="headers" api-url="/users"></data-table>
             </v-card-title>
         </v-card>
         <v-dialog transition="slide-y-transition" v-model="dialog" max-width="480" lazy>
@@ -61,12 +61,13 @@
                     {
                         icon: 'delete',
                         color: 'error',
-                        click: item => console.log(item),
+                        click: item => console.log(this.selected),
                         granted: item => {
                             return item.id % 2 === 1;
                         }
                     },
-                ]
+                ],
+                selected: []
             }
         },
         mixins: [theme],

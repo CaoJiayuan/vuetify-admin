@@ -12,9 +12,9 @@ let storage = new Store();
 axios.interceptors.request.use(config => {
     config.url  = API_PERFIX + config.url;
     if (config.guest !== true) {
-        // let jwt = storage.get(TOKEN_CACHE_NAME);
-        let expire = storage.get(TOKEN_EXPIRE_NAME, 0);
-        if (expire <= new Date().getTime()){
+        let jwt = storage.get(TOKEN_CACHE_NAME);
+        let expire = storage.get(TOKEN_EXPIRE_NAME);
+        if (jwt && expire && expire <= new Date().getTime()){
             store.getters.tokenStatus === REFRESHING || store.commit('setTokenStatus', UNRERFESH)
         }
         return refreshToken(config);

@@ -1,22 +1,31 @@
 <template>
     <v-layout row wrap>
         <v-flex xs12>
-            <v-data-table :must-sort="mustSort" :total-items="paginator.total" :dark="theme.dark" disable-initial-sort
+            <v-data-table :select-all="selectable" v-model="selected" :must-sort="mustSort"
+                          :total-items="paginator.total"
+                          :dark="theme.dark" disable-initial-sort
                           :headers="fields" :items="paginator.data" hide-actions :loading="loading"
                           :pagination.sync="pagination">
                 <template slot="no-data">
                     <div v-html="placeholder"></div>
                 </template>
                 <template slot="items" slot-scope="props">
-                    <tr>
+                    <tr  :active="props.selected">
+                        <td v-if="selectable">
+                            <v-checkbox
+                                    primary
+                                    hide-details
+                                    v-model="props.selected"
+                            ></v-checkbox>
+                        </td>
                         <td v-if="!field.action" :class="field.align ? 'text-xs-'+ field.align : 'text-xs-left'"
                             v-for="field in fields"
-                            v-html="renderField(props.item, field)" @click="clickField(props.item, field)">
+                            v-html="renderField(props.item, field)" @click="clickField(props.item, field, props)">
                         </td>
                         <td :class="'text-xs-' + actionsAlign" v-if="hasActions">
                             <v-btn :flat="action.flat" :dark="action.dark"
-                                   small :key="$index"
-                                   v-for="action in fixedActions" :color="action.color"
+                                   small :key="index"
+                                   v-for="(action, index) in fixedActions" :color="action.color"
                                    :class="action.class"
                                    :fab="!action.text"
                                    v-if="showAction(action, props.item)"
@@ -40,20 +49,17 @@
                     <v-icon>refresh</v-icon>
                 </v-btn>
             </v-flex>
-            <v-layout xs4 row>
-                <v-flex xs3  class="text-xs-right">
-                    <v-select
-                            :items="pageSizes"
-                            v-model="pageSize"
-                            single-line
-                            bottom
-                            label="Select"
-                            @input="load({})"
-                    ></v-select>
-                </v-flex>
-                <v-flex xs9>
-                    <v-subheader style="height: 74px;">{{displayAction(paginator)}}</v-subheader>
-                </v-flex>
+            <v-layout xs3 row  class="text-xl-right">
+                <v-select
+                        :items="pageSizes"
+                        v-model="pageSize"
+                        single-line
+                        bottom
+                        label="Select"
+                        @input="load({})"
+                        class="pull-right"
+                ></v-select>
+                <v-subheader class="pull-right" style="height: 74px;">{{displayAction(paginator)}}</v-subheader>
             </v-layout>
         </v-layout>
     </v-layout>
@@ -62,6 +68,7 @@
 <script>
     import Api from './api'
     import theme from '../../mixins/theme'
+    import { setQuery } from '../../app/utils'
 
     export default {
         props: {
@@ -96,7 +103,19 @@
             displayAction: {
                 type: Function,
                 default: paginator => `条/页, 从${paginator.from}到${paginator.to}条，共${paginator.total}条`
+            },
+            selectable: {
+                type: Boolean,
+                default: false
+            },
+            value: {
+                type: Array,
+                default: () => []
             }
+        },
+        model: {
+            prop: 'value',
+            event: 'change'
         },
         mixins: [theme],
         data () {
@@ -124,31 +143,45 @@
                     25,
                 ],
                 pageSize: 10,
-                showActions : false
+                showActions: false
             }
         },
         computed: {
             hasActions () {
                 let has = false
                 this.actions.forEach(action => {
-                     has = true
+                    has = true
                 })
                 return has
             },
-
+            selected: {
+                get () {
+                    return this.value
+                },
+                set (v) {
+                    this.$emit('change', v)
+                }
+            }
         },
         components: {},
         methods: {
-            load ({per_page = this.pageSize, page = 1, sort}) {
+            load ({per_page = this.pageSize, page = 1, sort, filters = {}}) {
                 this.loading = 'green'
-                return Api.getData(this.apiUrl, {
+                this.selected = [];
+                let params = {
                     per_page,
                     page,
-                    sort : sort !== undefined ? sort : this.resolveSort(this.pagination)
-                }).then(paginator => {
+                    sort: sort !== undefined ? sort : this.resolveSort(this.pagination),
+                };
+                filters = this.buildFilters(filters);
+                return Api.getData(this.apiUrl, Object.assign(params, filters)).then(response => {
+                    let paginator = response.data;
                     this.loading = false
                     this.refreshing = false
-
+                    paginator.url = setQuery(response.config.url, response.config.params);
+                    this.paginator = paginator;
+                    this.paginator.from = paginator.from ? paginator.from : 0;
+                    this.paginator.to = paginator.to ? paginator.to : 0;
                     this.paginator = paginator
                     this.pagination.page = paginator.current_page
                     this.pagination.rowsPerPage = paginator.per_page
@@ -178,11 +211,11 @@
                     let {icon = '', text = '', color = 'primary', dark = false, flat = false, granted = true} = action
 
                     if (granted !== true) {
-                        let fun = this.getParentMethod(granted);
-                        if (fun){
+                        let fun = this.getParentMethod(granted)
+                        if (fun) {
                             granted = fun
                         }
-                    } else  {
+                    } else {
                         granted = item => true
                     }
 
@@ -209,17 +242,17 @@
                     page: page
                 })
             },
-            showAction(action, item){
-                let show = true;
+            showAction (action, item) {
+                let show = true
                 if (action.granted) {
                     show = this.callParentMethod(action.granted, item)
                 }
 
-                if (show){
-                    this.showActions = true;
+                if (show) {
+                    this.showActions = true
                 }
 
-                return show;
+                return show
             },
 
             getParentMethod (method) {
@@ -239,19 +272,21 @@
                 }
                 return m
             },
-            clickField (item, field) {
+            clickField (item, field, row) {
                 let value = item[field.value]
                 let click = field.click
                 if (click) {
                     this.callParentMethod(click, value, item)
+                } else  {
+                    this.selectRow(row)
                 }
             },
             refresh () {
                 this.refreshing = true
                 this.pagination.sortBy = null
                 return this.load({
-                    per_page : this.pageSize,
-                    page : 1,
+                    per_page: this.pageSize,
+                    page: 1,
                     sort: null
                 })
             },
@@ -262,6 +297,21 @@
                     return key
                 }
                 return undefined
+            },
+            selectRow(row) {
+                this.selected = [];
+                this.selectable && (this.selected = [row.item]);
+            },
+            buildFilters(filters, name = 'filters') {
+                let clone = _.clone(filters);
+                let result = {};
+                for (let k in clone) {
+                    if (clone.hasOwnProperty(k) && [null, '', undefined].indexOf(clone[k]) < 0) {
+                        let key = `${name}[${k}]`;
+                        result[key] = clone[k];
+                    }
+                }
+                return result;
             }
         },
         mounted () {

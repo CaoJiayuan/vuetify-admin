@@ -12,20 +12,15 @@
         <v-divider></v-divider>
         <v-list>
             <template v-for="item in items">
-                <v-list-group v-if="hasNode(item)" :group="item.name">
-                    <v-list-tile slot="item" ripple>
-                        <v-list-tile-action>
-                            <v-icon>{{ item.icon }}</v-icon>
-                        </v-list-tile-action>
+                <v-list-group :prepend-icon="item.icon"
+                              no-action v-if="hasNode(item) && item.granted !== false" :group="item.name">
+                    <v-list-tile slot="activator" ripple>
                         <v-list-tile-content>
                             <v-list-tile-title>{{ item.display_name }}</v-list-tile-title>
                         </v-list-tile-content>
-                        <v-list-tile-action>
-                            <v-icon>keyboard_arrow_down</v-icon>
-                        </v-list-tile-action>
                     </v-list-tile>
                     <v-list-tile :to="node.path" ripple v-model="active === item.name" v-for="node in item.nodes"
-                                 :key="node.name" @click="navigate(node)">
+                                 :key="node.name" @click="navigate(node)" v-if="node.granted !== false">
                         <v-list-tile-content>
                             <v-list-tile-title>{{ node.display_name }}</v-list-tile-title>
                         </v-list-tile-content>
@@ -34,8 +29,8 @@
                         </v-list-tile-action>
                     </v-list-tile>
                 </v-list-group>
-                <v-list-tile v-else :to="item.path" v-model="active === item.name" ripple :key="item.name"
-                             @click="navigate(item)">
+                <v-list-tile :to="item.path"  v-if="item.granted !== false && !hasNode(item)" v-model="active === item.name" ripple :key="item.name"
+                              @click="navigate(item)">
                     <v-list-tile-action>
                         <v-icon>{{ item.icon }}</v-icon>
                     </v-list-tile-action>
@@ -79,7 +74,15 @@
                 this.active = item.name;
             },
             hasNode(item) {
-                return this.getNode(item).length > 0;
+                let node = this.getNode(item)
+                let hasOne = false;
+                node.forEach(n => {
+                    if (n.granted !== false) {
+                        hasOne = true;
+                    }
+                })
+
+                return node.length > 0 && hasOne;
             },
             getNode(item) {
                 return item.nodes ? item.nodes : [];
