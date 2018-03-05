@@ -27,7 +27,7 @@ axios.interceptors.request.use(config => {
 axios.interceptors.response.use(response => response, error => {
 
     if (error.response.status === 401) {
-        router.push(LOGIN_PATH)
+        goLogin();
     } else  {
        error.config.toast !== false && store.dispatch('toast', {
             color : 'error',
@@ -47,7 +47,7 @@ function refreshToken (config) {
 
             return Promise.resolve(config);
         }).catch(error => {
-            router.push(LOGIN_PATH)
+            goLogin();
         })
     } else {
         if (store.getters.tokenStatus === REFRESHING) {
@@ -72,4 +72,9 @@ function setToken (config, resolve, reject) {
     let jwt = storage.get(TOKEN_CACHE_NAME);
     config.headers.common['Authorization'] = 'Bearer ' + jwt;
     resolve(config)
+}
+
+function goLogin () {
+    UserApi.clearToken();
+    router.push(LOGIN_PATH);
 }
