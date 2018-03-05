@@ -47,7 +47,7 @@ function refreshToken (config) {
 
             return Promise.resolve(config);
         }).catch(error => {
-
+            router.push(LOGIN_PATH)
         })
     } else {
         if (store.getters.tokenStatus === REFRESHING) {
